@@ -9,7 +9,10 @@ class dvlaAuction:
 
         soup = self._get_data()
         lot_nos, regs, starting_prices, prices, lengths, end_times = self._parse_soup(soup)
-        pandasDB = self._lists_to_pandas(lot_nos, regs, starting_prices, prices, lengths, end_times, ["lot_no", "reg", "starting_price", "current_price", "length", "end_time"])
+        pandasDB = self._lists_to_pandas(list(zip(lot_nos, regs, starting_prices, prices, lengths, end_times)), ["lot_no", "reg", "starting_price", "current_price", "length", "end_time"])
+
+        self.auctiondb = pandasDB
+        
         print(f"DEBUG | pandasDB generated")
         pandasDB.to_excel(f"{self.id}.xlsx")
         print(f"DEBUG | Saved as {self.id}.xlsx")
@@ -50,14 +53,7 @@ class dvlaAuction:
     def _ints_from_str(self, string: str) -> list[int]:
         return [int(s) for s in string.split() if s.isdigit()]
     
-    def _lists_to_pandas(self, list1, list2, list3, list4, list5, list6, columnNames) -> pd.DataFrame:
-        return pd.DataFrame({
-            columnNames[0]: list1,
-            columnNames[1]: list2,
-            columnNames[2]: list3,
-            columnNames[3]: list4,
-            columnNames[4]: list5,
-            columnNames[5]: list6,
-        })
+    def _lists_to_pandas(self, listZipped, columnNames) -> pd.DataFrame:
+        return pd.DataFrame(listZipped, columns=columnNames)
 
 dvlaAuction("B260")
