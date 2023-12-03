@@ -8,3 +8,5 @@ Python program to automatically scrape current DVLA Registration Auction data.
    ```bash
    pip install -r requirements.txt
    ```
+
+Best performed in a virtual environement such as venv or conda
