@@ -2,24 +2,32 @@ import requests
 import pandas as pd
 from datetime import datetime
 from bs4 import BeautifulSoup
+import os
 
 class dvlaAuction:
     def __init__(self, id: str) -> None:
         self.id = id
+        self.dir = os.path.abspath("")
+        self.results_dir = os.path.join(self.dir, "auction_results")
 
+    def run(self):
         soup = self._get_data()
+        if not soup:
+            return
         lot_nos, regs, starting_prices, prices, lengths, end_times = self._parse_soup(soup)
         pandasDB = self._lists_to_pandas(list(zip(lot_nos, regs, starting_prices, prices, lengths, end_times)), ["lot_no", "reg", "starting_price", "current_price", "length", "end_time"])
 
         self.auctiondb = pandasDB
         
         print(f"DEBUG | pandasDB generated")
-        pandasDB.to_excel(f"{self.id}.xlsx")
+        pandasDB.to_excel(os.path.join(self.results_dir, f"{self.id}.xlsx"))
         print(f"DEBUG | Saved as {self.id}.xlsx")
 
     def _get_data(self):
         resp = requests.get(f"https://dvlaauction.co.uk/auction/{self.id}/")
         print(f"DEBUG | Request OK: {resp.ok} | Request Status Code: {resp.status_code}")
+        if resp.status_code == 404:
+            return
         soup = BeautifulSoup(resp.content, features="html.parser")
         return soup
     
@@ -55,5 +63,3 @@ class dvlaAuction:
     
     def _lists_to_pandas(self, listZipped, columnNames) -> pd.DataFrame:
         return pd.DataFrame(listZipped, columns=columnNames)
-
-dvlaAuction("B260")
