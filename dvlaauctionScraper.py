@@ -25,7 +25,7 @@ class dvlaAuction:
 
     def _get_data(self):
         resp = requests.get(f"https://dvlaauction.co.uk/auction/{self.id}/")
-        print(f"DEBUG | Request OK: {resp.ok} | Request Status Code: {resp.status_code}")
+        print(f"DEBUG | Auction ID: {self.id} | Request OK: {resp.ok} | Request Status Code: {resp.status_code}")
         if resp.status_code == 404:
             return
         soup = BeautifulSoup(resp.content, features="html.parser")
