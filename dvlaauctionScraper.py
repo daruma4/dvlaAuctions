@@ -14,14 +14,12 @@ class dvlaAuction:
         soup = self._get_data()
         if not soup:
             return
-        lot_nos, regs, starting_prices, prices, lengths, end_times = self._parse_soup(soup)
-        pandasDB = self._lists_to_pandas(list(zip(lot_nos, regs, starting_prices, prices, lengths, end_times)), ["lot_no", "reg", "starting_price", "current_price", "length", "end_time"])
-
-        self.auctiondb = pandasDB
+        lot_nos, regs, starting_prices, prices, lengths = self._parse_soup(soup)
+        pandasDB = self._lists_to_pandas(list(zip(lot_nos, regs, starting_prices, prices, lengths)), ["lot_no", "reg", "starting_price", "current_price", "length"])
         
         print(f"DEBUG | pandasDB generated")
         pandasDB.to_excel(os.path.join(self.results_dir, f"{self.id}.xlsx"))
-        print(f"DEBUG | Saved as {self.id}.xlsx")
+        print(f"DEBUG | Saved {os.path.join(self.results_dir, f'{self.id}.xlsx')}")
 
     def _get_data(self):
         resp = requests.get(f"https://dvlaauction.co.uk/auction/{self.id}/")
@@ -39,7 +37,6 @@ class dvlaAuction:
         starting_prices = []
         prices = []
         lengths = []
-        end_times = []
 
         for record in recordList:
             lot_no = self._ints_from_str(record.find("td", class_="field-id unit unit-id data-id").text)
@@ -54,7 +51,7 @@ class dvlaAuction:
             prices.append(price)
             lengths.append(length)
 
-        return lot_nos, regs, starting_prices, prices, lengths, end_times
+        return lot_nos, regs, starting_prices, prices, lengths
     
     def _ints_from_str(self, string: str) -> list[int]:
         return [int(s) for s in string.split() if s.isdigit()]
