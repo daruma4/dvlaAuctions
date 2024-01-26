@@ -46,7 +46,6 @@ class dvlaAuction:
             reg = record.find("td", class_="field-name data-text")["data-sort"]
             starting_price = record.find("td", class_="field-reserve data-gbp")["data-sort"]
             price = record.find("td", class_="field-current-price data-gbp")["data-sort"]
-            end_time = datetime.utcfromtimestamp(int(record.find("td", class_="field-end-time data-datetime")["data-sort"])).strftime("%Y-%m-%d %H:%M:%S")
             length = len(reg)
 
             lot_nos.append(lot_no)
@@ -54,7 +53,6 @@ class dvlaAuction:
             starting_prices.append(starting_price)
             prices.append(price)
             lengths.append(length)
-            end_times.append(end_time)
 
         return lot_nos, regs, starting_prices, prices, lengths, end_times
     
