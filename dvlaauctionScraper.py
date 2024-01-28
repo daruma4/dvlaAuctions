@@ -14,8 +14,8 @@ class dvlaAuction:
         soup = self._get_data()
         if not soup:
             return
-        lot_nos, regs, starting_prices, prices, lengths = self._parse_soup(soup)
-        pandasDB = self._lists_to_pandas(list(zip(lot_nos, regs, starting_prices, prices, lengths)), ["lot_no", "reg", "starting_price", "current_price", "length"])
+        lot_nos, regs, starting_prices, prices, lengths, categories = self._parse_soup(soup)
+        pandasDB = self._lists_to_pandas(list(zip(lot_nos, regs, starting_prices, prices, lengths, categories)), ["lot_no", "reg", "starting_price", "current_price", "length", "category"])
         
         print(f"DEBUG | pandasDB generated")
         pandasDB.to_excel(os.path.join(self.results_dir, f"{self.id}.xlsx"))
@@ -37,12 +37,14 @@ class dvlaAuction:
         starting_prices = []
         prices = []
         lengths = []
+        categories = []
 
         for record in recordList:
             lot_no = self._ints_from_str(record.find("td", class_="field-id unit unit-id data-id").text)
             reg = record.find("td", class_="field-name data-text")["data-sort"]
             starting_price = record.find("td", class_="field-reserve data-gbp")["data-sort"]
             price = record.find("td", class_="field-current-price data-gbp")["data-sort"]
+            category = self._text_cleaner(record.find("td", class_="field-lot-categories").text)
             length = len(reg)
 
             lot_nos.append(lot_no)
@@ -50,11 +52,20 @@ class dvlaAuction:
             starting_prices.append(starting_price)
             prices.append(price)
             lengths.append(length)
+            categories.append(category)
 
-        return lot_nos, regs, starting_prices, prices, lengths
+        return lot_nos, regs, starting_prices, prices, lengths, categories
     
     def _ints_from_str(self, string: str) -> list[int]:
         return [int(s) for s in string.split() if s.isdigit()]
     
+    def _text_cleaner(self, string: str) -> str:
+        text = string
+        text = text.replace("\r", "").replace("\n", "").replace(" ", "")
+        return text
+    
     def _lists_to_pandas(self, listZipped, columnNames) -> pd.DataFrame:
         return pd.DataFrame(listZipped, columns=columnNames)
+    
+dvlaAuction = dvlaAuction("B260")
+dvlaAuction.run()
