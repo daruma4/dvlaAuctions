@@ -66,6 +66,3 @@ class dvlaAuction:
     
     def _lists_to_pandas(self, listZipped, columnNames) -> pd.DataFrame:
         return pd.DataFrame(listZipped, columns=columnNames)
-    
-dvlaAuction = dvlaAuction("B260")
-dvlaAuction.run()
