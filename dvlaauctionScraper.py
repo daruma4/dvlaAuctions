@@ -5,10 +5,11 @@ from bs4 import BeautifulSoup
 import os
 
 class dvlaAuction:
-    def __init__(self, id: str) -> None:
+    def __init__(self, id: str, space_incl: bool) -> None:
         self.id = id
         self.dir = os.path.abspath("")
         self.results_dir = os.path.join(self.dir, "auction_results")
+        self.space_include_reg = space_incl
 
     def run(self):
         soup = self._get_data()
@@ -41,7 +42,10 @@ class dvlaAuction:
 
         for record in recordList:
             lot_no = self._ints_from_str(record.find("td", class_="field-id unit unit-id data-id").text)
-            reg = record.find("td", class_="field-name data-text")["data-sort"]
+            if self.space_include_reg:
+                reg = record.find("td", class_="field-name data-text").getText().lstrip().rstrip()
+            else:
+                reg = record.find("td", class_="field-name data-text")["data-sort"]
             starting_price = record.find("td", class_="field-reserve data-gbp")["data-sort"]
             price = record.find("td", class_="field-current-price data-gbp")["data-sort"]
             category = self._text_cleaner(record.find("td", class_="field-lot-categories").text)
