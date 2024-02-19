@@ -9,4 +9,4 @@ files_dir = [os.path.join(EXCELS_DIR, f) for f in files]
 
 df = pd.concat([pd.read_excel(f) for f in files_dir], ignore_index=True)
 
-df.to_excel(os.path.join((EXCELS_DIR), "combined.xlsx"))
+df.to_csv("output\\combined_auction_results.csv")
